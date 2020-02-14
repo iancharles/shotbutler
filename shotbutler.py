@@ -1,4 +1,5 @@
 import boto3
+from time import sleep
 import sys
 
 # Get setup information
@@ -40,28 +41,32 @@ customer_snapshots = []
 for snapshot in snapshots['Snapshots']:
     if search_filter in snapshot['Description']:
         print(f"Now copying - Snapshot ID: {snapshot['SnapshotId']}, Description: {snapshot['Description']}")
-        ec2.copy_snapshot(
-            Description="Copy - " + snapshot['SnapshotId'],
-            Encrypted=True,
-            KmsKeyId=new_kms_key,
-            SourceRegion=region_nm,
-            SourceSnapshotId=snapshot['SnapshotId'],
-            TagSpecifications=[
-                {
-                    'ResourceType': 'snapshot',
-                    'Tags': [
-                        {
-                            'Key': 'shot_butler',
-                            'Value': 'True'
-                        },
-                        {
-                            'Key': 'search_filter',
-                            'Value': search_filter
-                        }
-                    ]
-                },
-            ]
-        )
+        try:
+            ec2.copy_snapshot(
+                Description="Copy - " + snapshot['SnapshotId'],
+                Encrypted=True,
+                KmsKeyId=new_kms_key,
+                SourceRegion=region_nm,
+                SourceSnapshotId=snapshot['SnapshotId'],
+                TagSpecifications=[
+                    {
+                        'ResourceType': 'snapshot',
+                        'Tags': [
+                            {
+                                'Key': 'shot_butler',
+                                'Value': 'True'
+                            },
+                            {
+                                'Key': 'search_filter',
+                                'Value': search_filter
+                            }
+                        ]
+                    },
+                ]
+            )
+        except ClientError as e:
+            print(f"{e} happened.\n Waiting 5 seconds.\n Hit CTRL-C to cancel")
+            sleep(5)
 
 
 # Get snapshots, this time filtered to get the new ones for this search filter
