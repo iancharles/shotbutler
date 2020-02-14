@@ -37,37 +37,44 @@ snapshots = ec2.describe_snapshots(
     ]
 )
 
-customer_snapshots = []
+# customer_snapshots = []
+max_retries = 999
 # Create new snapshots
 for snapshot in snapshots['Snapshots']:
     if search_filter in snapshot['Description']:
         print(f"Now copying - Snapshot ID: {snapshot['SnapshotId']}, Description: {snapshot['Description']}")
-        try:
-            ec2.copy_snapshot(
-                Description="Copy - " + snapshot['SnapshotId'],
-                Encrypted=True,
-                KmsKeyId=new_kms_key,
-                SourceRegion=region_nm,
-                SourceSnapshotId=snapshot['SnapshotId'],
-                TagSpecifications=[
-                    {
-                        'ResourceType': 'snapshot',
-                        'Tags': [
-                            {
-                                'Key': 'shot_butler',
-                                'Value': 'True'
-                            },
-                            {
-                                'Key': 'search_filter',
-                                'Value': search_filter
-                            }
-                        ]
-                    },
-                ]
-            )
-        except botocore.exceptions.ClientError as e:
-            print(f"{e} happened.\n Waiting 5 seconds.\n Hit CTRL-C to cancel")
-            sleep(5)
+        for attempt in range(max_retries):
+            try:
+                ec2.copy_snapshot(
+                    Description="Copy - " + snapshot['SnapshotId'],
+                    Encrypted=True,
+                    KmsKeyId=new_kms_key,
+                    SourceRegion=region_nm,
+                    SourceSnapshotId=snapshot['SnapshotId'],
+                    TagSpecifications=[
+                        {
+                            'ResourceType': 'snapshot',
+                            'Tags': [
+                                {
+                                    'Key': 'shot_butler',
+                                    'Value': 'True'
+                                },
+                                {
+                                    'Key': 'search_filter',
+                                    'Value': search_filter
+                                }
+                            ]
+                        },
+                    ]
+                )
+                break
+            except ec2.exceptions.ClientError as e:
+                backoff = (2 * attempt) * 10
+                print(f"{e} happened.\n Retrying...\n Hit CTRL-C to cancel")
+                sleep(backoff)
+                pass
+            else:
+                print("Other error")
 
 
 # Get snapshots, this time filtered to get the new ones for this search filter
@@ -90,7 +97,7 @@ snapshots_to_xfer = ec2.describe_snapshots(
     ]
 )
 
-print (snapshots_to_xfer)
+
 
 for snapshot in snapshots_to_xfer['Snapshots']:
     print(f"Now sharing {snapshot['SnapshotId']} with {new_acct}")
