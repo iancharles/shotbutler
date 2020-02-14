@@ -64,7 +64,7 @@ for snapshot in snapshots['Snapshots']:
                     },
                 ]
             )
-        except ClientError as e:
+        except botocore.exceptions.ClientError as e:
             print(f"{e} happened.\n Waiting 5 seconds.\n Hit CTRL-C to cancel")
             sleep(5)
 
