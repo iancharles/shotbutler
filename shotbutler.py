@@ -2,9 +2,10 @@ import boto3
 import sys
 
 # Get setup information
-print("Welcome to Shot Butler! Before proceeding, please double-check that your AWS_PROFILE environment is set to the correct account.")
+print("Welcome to Shot Butler!")
+profile_nm = input("Enter AWS Profile to use. This must be already extant. ")
 region_nm = input("Enter region in format like 'us-east-1': ")
-session = boto3.Session(profile_name="default", region_name=region_nm)
+session = boto3.Session(profile_name=profile_nm, region_name=region_nm)
 # Get account to transfer from. Your current profile should be accessing this one
 orig_acct = input("What account are you transferring from? ")
 # Get account to transfer to

@@ -4,9 +4,9 @@ A CLI tool for sharing AWS EBS snapshots between accounts with new KMS keys
 
 ## Prerequisites:
 - Python 3 (I have tested this on Python 3.7. I can't vouch for earlier versions.)
-- You will need a current version of boto3
-- You will need to have a valid AWS_PROFILE configured
-- You will need the following information available:
+- A current version of boto3
+- A valid AWS_PROFILE configured in ~/.aws/config
+- You will want the following information available:
     - Desired region
     - AWS account number for current (origin) account
     - AWS account number for target account
