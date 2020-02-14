@@ -1,6 +1,7 @@
 import boto3
 from time import sleep
 import sys
+import botocore
 
 # Get setup information
 print("Welcome to Shot Butler!")
