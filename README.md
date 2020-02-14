@@ -14,11 +14,9 @@ A CLI tool for sharing AWS EBS snapshots between accounts with new KMS keys
     - Search filter (i.e. if snapshots must meet a certain description). This keys off the "Description" field for snapshots.
 
 ## Potential issues
-- This will run into issues in accounts with more than 20 snapshots that meet the filter criteria.
 - If you are using an older version of Python 3 (3.5 or earlier), there may be some issues with format strings printing out information in a readable format.
 
 ## To-Do:
 This is very much a work in progress. Goals include:
-- Fix 20 snapshot limit with pagination
 - Add option to generate new KMS key
 - Add ability to delete original snapshots once they have been copied to a new shot
